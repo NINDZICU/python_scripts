@@ -4,6 +4,7 @@ from collections import deque
 import re
 
 startLink = "https://ria.ru/"
+linksFileName = "web_pages/links.txt"
 q = deque()
 links = [startLink]
 
@@ -18,7 +19,8 @@ def saveFromInternet(link, number):
 		with urlopen(req) as url:
 			content = url.read().decode()
 			soup = BeautifulSoup(content, 'html.parser')
-			file.write(link + '\n')
+			with open(linksFileName, "a", encoding="utf-8") as linksFile:
+				linksFile.write(str(number) + ". "+link + '\n')
 			for par in soup.find_all(['p','h1', 'h2', 'span', 'strong', 'em']):
 				text = par.get_text()
 				isTime = re.match(r'^\d{2}:\d{2}$', text)
