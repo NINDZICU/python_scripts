@@ -1,4 +1,5 @@
 import os
+import pymorphy2
 
 words = []
 
@@ -21,7 +22,7 @@ words_set = list(set(words))
 results = []
 
 for lem in words_set:
-    result = ""
+    result = lem + ":"
     for i in range(0, 99):
         if lem not in lemms[i]:
             result = result + "0"
@@ -36,4 +37,25 @@ for lem in words_set:
 with open(os.getcwd() + "/BaseSearchSystem/index/index.txt", "a", encoding="utf-8") as file:
     for line in results:
         file.write(line + "\n")
+
+def find(s, ch):
+    return [i for i, ltr in enumerate(s) if ltr == ch]
     
+morph = pymorphy2.MorphAnalyzer()
+
+while True:
+    search_string = str(input()).strip()
+    lematText = morph.parse(search_string)[0].normal_form
+    lines = get_all_lines("/BaseSearchSystem/index/index.txt")
+    find_result = [l for l in lines if l.startswith(lematText)]
+    string = find_result[0]
+    if string is None:
+        continue
+    
+    index = string.index(":")
+    string = string[index+1:]
+    indexes = find(string, "1")
+    links = get_all_lines("/BaseSearchSystem/web_pages/links.txt")
+    for l in indexes:
+        print(links[l])
+
