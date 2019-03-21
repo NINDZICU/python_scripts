@@ -4,7 +4,7 @@ import pymorphy2
 import math
 
 morph = pymorphy2.MorphAnalyzer()
-filename = "/TfIdf/TfIdf.txt"
+filename = "/BaseSearchSystem/TfIdf/TfIdf.txt"
 words = [] 
 indexs = []
 
@@ -24,7 +24,7 @@ def readIndexsByNumberStr(filename):
 def calculateTfIdfRequestVector(search_string, setPositionInFile):
     idfVector = []
     words_search = search_string.split()
-    idfCofs = Utilits.get_by_single_lines("/TfIdf/Idf.txt")
+    idfCofs = Utilits.get_by_single_lines("/BaseSearchSystem/TfIdf/Idf.txt")
     maxCount = 0
     for word in words_search:
         count = words_search.count(word)
@@ -64,20 +64,32 @@ def calculateAngle(indexs, vector, setPositionInFile):
     return similarity
 
 def printSimilarityDocs(similarityMatrix):
-    maxCos = similarityMatrix.index(max(similarityMatrix))
-    print("doc " + str(maxCos+1))
+    sortMatrix = similarityMatrix.copy()
+    sortMatrix.sort(reverse = True)
+
+
+    for i, item in enumerate(sortMatrix):
+        maxCos = similarityMatrix.index(item)
+        if(i == 10 or maxCos == 0): break
+
+        with open(os.getcwd() + "\BaseSearchSystem\web_pages\links.txt", "r", encoding="utf-8") as fp:
+            for i, line in enumerate(fp):
+                if i == maxCos:
+                    print(line)
 
 def handleRequest(search_string, filename):
     global indexs
     positionInFile = set()
     words_search = search_string.split()
+    lemat_words_search = ""
     for word in words_search:
         lematWord = morph.parse(word)[0].normal_form
+        lemat_words_search += lematWord + " "
         number_str = Utilits.find(words, lematWord)
         if(len(number_str)>0):
             positionInFile.add(number_str[0])
     readIndexsByNumberStr(filename)
-    idfVector = calculateTfIdfRequestVector(search_string, positionInFile)
+    idfVector = calculateTfIdfRequestVector(lemat_words_search, positionInFile)
     similarity = calculateAngle(indexs, idfVector, positionInFile)
     if(len(similarity)>0):
         printSimilarityDocs(similarity)
@@ -87,5 +99,5 @@ readWordsFromFile(filename)
 
 while True:
     print("Введите строку поиска")
-    search_string = str(input()).strip()
+    search_string = str(input()).strip().lower()
     handleRequest(search_string, filename)

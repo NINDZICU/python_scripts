@@ -19,7 +19,7 @@ for i in range(0, len(links)):
 for link in links:
     html = urllib.request.urlopen(link, context=ctx).read()
     soup = BeautifulSoup(html, features="html5lib")
-    
+    print(link)
     links_in_link = soup.findAll('a')
     all_links = set()
     for link in links_in_link:
@@ -40,3 +40,15 @@ for row in matrix:
     pagerank_file.write(''.join(map(str, row))+'\n')
 
 pagerank_file.close()
+
+def calculatePageRank(matrixTransition, links):
+    pageRankMatrix = {}
+    for i in range(0, len(matrixTransition)):
+        sumTransition = 0
+        for transition in Utilits.column(matrixTransition, i):
+            sumTransition += transition
+            pageRankMatrix.update({links[i]: sumTransition})
+        #pageRankMatrix.append(map (links[i], sumTransition))
+    print(pageRankMatrix)
+
+calculatePageRank(matrix, links)
