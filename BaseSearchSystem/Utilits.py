@@ -18,3 +18,6 @@ def find(s, ch):
 
 def column(matrix, i): 
     return [row[i] for row in matrix]
+
+def getIndexLink(matrix, i):
+    return {a : row for a, row in enumerate(matrix) if row[i] == "1"}
